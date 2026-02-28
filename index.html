@@ -13,11 +13,11 @@ font-family:Arial, sans-serif;
 
 #mensaje{
 position:absolute;
-top:20px;
+top:15px;
 width:100%;
 text-align:center;
 color:white;
-font-size:20px;
+font-size:18px;
 font-weight:bold;
 z-index:10;
 text-shadow:0 0 15px #c77dff;
@@ -25,11 +25,11 @@ text-shadow:0 0 15px #c77dff;
 
 iframe{
 position:absolute;
-bottom:20px;
+bottom:15px;
 left:50%;
 transform:translateX(-50%);
-border-radius:12px;
 z-index:10;
+border-radius:12px;
 }
 </style>
 </head>
@@ -39,16 +39,18 @@ z-index:10;
 Te amo mi Goldix hermosa 🥺💜 mi princesa mi reina mi luna mi perla mi sol mi estrella mi galaxia favorita ✨
 </div>
 
-<iframe
-src="https://open.spotify.com/embed/track/46U8ErW47SBTzO6jzxfZlx"
+<iframe src="https://open.spotify.com/embed/track/46U8ErW47SBTzO6jzxfZlx"
 width="300" height="80"
 frameborder="0"
-allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture">
+allow="autoplay; encrypted-media">
 </iframe>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128/examples/js/controls/OrbitControls.js"></script>
+
 <script>
 
+// ESCENA
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
 const renderer = new THREE.WebGLRenderer({antialias:true});
@@ -57,107 +59,90 @@ document.body.appendChild(renderer.domElement);
 
 camera.position.z = 10;
 
+// CONTROLES (FUNCIONA EN CELULAR)
+const controls = new THREE.OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+controls.enableZoom = true;
+
 // LUCES
 const light = new THREE.PointLight(0xffffff,2);
-light.position.set(5,5,5);
+light.position.set(10,10,10);
 scene.add(light);
 
-const ambient = new THREE.AmbientLight(0x404040,2);
-scene.add(ambient);
+scene.add(new THREE.AmbientLight(0x404040,2));
 
-// GRUPO PLANETA PRINCIPAL
+// -------- PLANETA PRINCIPAL --------
 const planetGroup = new THREE.Group();
 scene.add(planetGroup);
 
-// TEXTURA DINÁMICA
-const canvasTexture = document.createElement("canvas");
-canvasTexture.width = 2048;
-canvasTexture.height = 1024;
-const ctx = canvasTexture.getContext("2d");
+const geometry = new THREE.SphereGeometry(2,128,128);
 
-const gradient = ctx.createRadialGradient(1024,512,150,1024,512,900);
-gradient.addColorStop(0,"#ff00cc");
-gradient.addColorStop(0.3,"#c77dff");
-gradient.addColorStop(0.6,"#7209b7");
-gradient.addColorStop(1,"#240046");
-
-ctx.fillStyle = gradient;
-ctx.fillRect(0,0,2048,1024);
-
-for(let i=0;i<15000;i++){
-ctx.fillStyle="rgba(255,255,255,0.02)";
-ctx.beginPath();
-ctx.arc(Math.random()*2048,Math.random()*1024,Math.random()*2.5,0,Math.PI*2);
-ctx.fill();
-}
-
-const texture = new THREE.CanvasTexture(canvasTexture);
-
-const geometry = new THREE.SphereGeometry(2.5,256,256);
 const material = new THREE.MeshStandardMaterial({
-map:texture,
-emissive:0xaa00ff,
-emissiveIntensity:0.8,
-metalness:0.6,
-roughness:0.3
+color:0x9d4edd,
+emissive:0x5a189a,
+emissiveIntensity:0.6,
+metalness:0.5,
+roughness:0.4
 });
 
 const planet = new THREE.Mesh(geometry,material);
 planetGroup.add(planet);
 
 // ATMÓSFERA
-const atmosphereGeometry = new THREE.SphereGeometry(2.7,128,128);
-const atmosphereMaterial = new THREE.MeshBasicMaterial({
-color:0xff66ff,
+const atmosphere = new THREE.Mesh(
+new THREE.SphereGeometry(2.3,128,128),
+new THREE.MeshBasicMaterial({
+color:0xc77dff,
 transparent:true,
-opacity:0.2
-});
-const atmosphere = new THREE.Mesh(atmosphereGeometry,atmosphereMaterial);
+opacity:0.15
+})
+);
 planetGroup.add(atmosphere);
 
 // ANILLO
-const ringGeometry = new THREE.RingGeometry(3.2,4.5,256);
+const ringGeometry = new THREE.RingGeometry(2.8,4,128);
 const ringMaterial = new THREE.MeshBasicMaterial({
 color:0xffffff,
 side:THREE.DoubleSide,
 transparent:true,
-opacity:0.25
+opacity:0.3
 });
 const ring = new THREE.Mesh(ringGeometry,ringMaterial);
 ring.rotation.x = Math.PI/2.4;
 planetGroup.add(ring);
 
-// SEGUNDO PLANETA ORBITANDO
-const smallPlanetGeometry = new THREE.SphereGeometry(0.8,128,128);
-const smallPlanetMaterial = new THREE.MeshStandardMaterial({
-color:0x00b4ff,
+// -------- SEGUNDO PLANETA ORBITANDO --------
+const smallPlanet = new THREE.Mesh(
+new THREE.SphereGeometry(0.7,64,64),
+new THREE.MeshStandardMaterial({
+color:0x00c2ff,
 emissive:0x0077ff,
-emissiveIntensity:0.6
-});
-const smallPlanet = new THREE.Mesh(smallPlanetGeometry,smallPlanetMaterial);
+emissiveIntensity:0.5
+})
+);
 scene.add(smallPlanet);
 
-let angle = 0;
+let orbitAngle = 0;
 
-// ESTRELLAS
+// -------- ESTRELLAS --------
 const starGeometry = new THREE.BufferGeometry();
-const starCount = 8000;
-const positions = [];
+const starVertices = [];
 
-for(let i=0;i<starCount;i++){
-positions.push(
-(Math.random()-0.5)*300,
-(Math.random()-0.5)*300,
-(Math.random()-0.5)*300
+for(let i=0;i<8000;i++){
+starVertices.push(
+THREE.MathUtils.randFloatSpread(200),
+THREE.MathUtils.randFloatSpread(200),
+THREE.MathUtils.randFloatSpread(200)
 );
 }
 
-starGeometry.setAttribute('position', new THREE.Float32BufferAttribute(positions,3));
-const starMaterial = new THREE.PointsMaterial({color:0xffffff});
+starGeometry.setAttribute('position', new THREE.Float32BufferAttribute(starVertices,3));
+
+const starMaterial = new THREE.PointsMaterial({color:0xffffff,size:0.7});
 const stars = new THREE.Points(starGeometry, starMaterial);
 scene.add(stars);
 
-// FRASES FLOTANDO
+// -------- FRASES EN 3D --------
 const frases = [
 "Te amo 💜","Mi princesa 👑","Mi reina ❤️","Mi luna 🌙",
 "Mi perla 🤍","Mi sol ☀️","Mi estrella ✨",
@@ -168,59 +153,56 @@ const frases = [
 "Mi bb 🧸","Mi amor 💋"
 ];
 
-function crearTexto(texto){
-const div = document.createElement("div");
-div.innerText = texto;
-div.style.position="absolute";
-div.style.color="white";
-div.style.fontSize=(Math.random()*20+12)+"px";
-div.style.left=Math.random()*window.innerWidth+"px";
-div.style.top=Math.random()*window.innerHeight+"px";
-div.style.opacity=0.8;
-document.body.appendChild(div);
+function crearTexto3D(texto){
+const canvas = document.createElement("canvas");
+const ctx = canvas.getContext("2d");
+canvas.width = 512;
+canvas.height = 256;
+
+ctx.fillStyle="white";
+ctx.font="40px Arial";
+ctx.fillText(texto,20,120);
+
+const texture = new THREE.CanvasTexture(canvas);
+const material = new THREE.SpriteMaterial({map:texture});
+const sprite = new THREE.Sprite(material);
+
+sprite.position.set(
+THREE.MathUtils.randFloatSpread(30),
+THREE.MathUtils.randFloatSpread(30),
+THREE.MathUtils.randFloatSpread(30)
+);
+
+sprite.scale.set(4,2,1);
+scene.add(sprite);
 }
 
-for(let i=0;i<500;i++){
-crearTexto(frases[Math.floor(Math.random()*frases.length)]);
+for(let i=0;i<300;i++){
+crearTexto3D(frases[Math.floor(Math.random()*frases.length)]);
 }
 
-// CONTROL TÁCTIL
-let isDragging=false;
-let previousMousePosition={x:0,y:0};
-
-document.addEventListener("mousedown", ()=> isDragging=true);
-document.addEventListener("mouseup", ()=> isDragging=false);
-
-document.addEventListener("mousemove",(e)=>{
-if(isDragging){
-let deltaMove={
-x:e.offsetX-previousMousePosition.x,
-y:e.offsetY-previousMousePosition.y
-};
-planetGroup.rotation.y += deltaMove.x*0.005;
-planetGroup.rotation.x += deltaMove.y*0.005;
-}
-previousMousePosition={x:e.offsetX,y:e.offsetY};
-});
-
-// ANIMACIÓN
+// -------- ANIMACIÓN --------
 function animate(){
 requestAnimationFrame(animate);
 
 planetGroup.rotation.y += 0.002;
 
-// órbita segundo planeta
-angle += 0.01;
-smallPlanet.position.x = Math.cos(angle)*6;
-smallPlanet.position.z = Math.sin(angle)*6;
+orbitAngle += 0.01;
+smallPlanet.position.x = Math.cos(orbitAngle)*6;
+smallPlanet.position.z = Math.sin(orbitAngle)*6;
 
-// pulso energía
-planet.material.emissiveIntensity = 0.7 + Math.sin(Date.now()*0.002)*0.3;
-
+controls.update();
 renderer.render(scene,camera);
 }
 
 animate();
+
+// RESPONSIVE
+window.addEventListener("resize",()=>{
+camera.aspect = window.innerWidth/window.innerHeight;
+camera.updateProjectionMatrix();
+renderer.setSize(window.innerWidth, window.innerHeight);
+});
 
 </script>
 </body>
