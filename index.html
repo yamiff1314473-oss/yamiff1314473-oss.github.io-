@@ -3,59 +3,84 @@
 <head>
 <meta charset="UTF-8">
 <title>Mi Galaxia 💜</title>
-
 <style>
 body{
   margin:0;
   overflow:hidden;
-  background:black;
+  background:linear-gradient(black, purple);
+  font-family:sans-serif;
+  color:white;
 }
 
-.stars{
-  width:1px;
-  height:1px;
-  background:white;
+canvas{
+  display:block;
+}
+
+.mensaje{
   position:absolute;
-  box-shadow:
-  100px 200px white,
-  300px 400px white,
-  500px 100px white,
-  700px 300px white,
-  900px 500px white,
-  1200px 200px white,
-  1500px 400px white,
-  1700px 600px white,
-  200px 700px white,
-  400px 900px white,
-  800px 1200px white,
-  1000px 1500px white;
-  animation: animStar 50s linear infinite;
-}
-
-@keyframes animStar{
-  from{transform: translateY(0px);}
-  to{transform: translateY(-2000px);}
-}
-
-h1{
-  position:absolute;
-  top:40%;
+  top:5%;
   width:100%;
   text-align:center;
-  color:#ff69b4;
-  font-size:35px;
-  text-shadow:0 0 20px #ff69b4;
+  font-size:22px;
+  background:rgba(0,0,0,0.4);
+  padding:10px;
+  border-radius:20px;
 }
 </style>
 </head>
-
 <body>
 
-<div class="stars"></div>
+<div class="mensaje">
+Te Amo Muchote Mis Ojitos Brillantes 💛
+</div>
 
-<h1 contenteditable="true">
-Escribe aquí tu mensaje 💖
-</h1>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+<script>
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+const renderer = new THREE.WebGLRenderer();
+renderer.setSize(window.innerWidth, window.innerHeight);
+document.body.appendChild(renderer.domElement);
+
+// Planeta
+const geometry = new THREE.SphereGeometry(2, 32, 32);
+const material = new THREE.MeshBasicMaterial({ color: 0x8000ff });
+const sphere = new THREE.Mesh(geometry, material);
+scene.add(sphere);
+
+camera.position.z = 6;
+
+// Estrellas
+const starGeometry = new THREE.BufferGeometry();
+const starCount = 2000;
+const positions = [];
+
+for(let i=0;i<starCount;i++){
+  positions.push(
+    (Math.random()-0.5)*200,
+    (Math.random()-0.5)*200,
+    (Math.random()-0.5)*200
+  );
+}
+
+starGeometry.setAttribute(
+  'position',
+  new THREE.Float32BufferAttribute(positions,3)
+);
+
+const starMaterial = new THREE.PointsMaterial({color:0xffffff});
+const stars = new THREE.Points(starGeometry,starMaterial);
+scene.add(stars);
+
+function animate(){
+  requestAnimationFrame(animate);
+  sphere.rotation.y += 0.01;
+  renderer.render(scene,camera);
+}
+
+animate();
+</script>
 
 </body>
 </html>
