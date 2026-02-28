@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <title>Mi Universo 💜</title>
+
 <style>
 body{
 margin:0;
@@ -21,6 +22,16 @@ font-size:18px;
 font-weight:bold;
 z-index:10;
 text-shadow:0 0 15px #c77dff;
+}
+
+.frase{
+position:absolute;
+color:white;
+opacity:0.8;
+pointer-events:none;
+white-space:nowrap;
+text-shadow:0 0 6px rgba(255,255,255,0.8);
+background:none !important;
 }
 
 iframe{
@@ -43,7 +54,7 @@ Te amo mi Goldix hermosa 🥺💜 mi princesa mi reina mi luna mi perla mi sol m
 src="https://open.spotify.com/embed/track/46U8ErW47SBTzO6jzxfZlx"
 width="300" height="80"
 frameborder="0"
-allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture">
+allow="autoplay; encrypted-media">
 </iframe>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -55,74 +66,51 @@ const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHei
 const renderer = new THREE.WebGLRenderer({antialias:true});
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
-camera.position.z = 10;
+camera.position.z = 9;
 
 // LUCES
-const light = new THREE.PointLight(0xffffff,2);
+scene.add(new THREE.AmbientLight(0xffffff,1.2));
+const light = new THREE.PointLight(0xffffff,1.5);
 light.position.set(5,5,5);
 scene.add(light);
-scene.add(new THREE.AmbientLight(0x404040,2));
 
 // GRUPO
-const planetGroup = new THREE.Group();
-scene.add(planetGroup);
+const group = new THREE.Group();
+scene.add(group);
 
-// PLANETA PRINCIPAL MEJORADO
+// PLANETA MEJORADO
 const geometry = new THREE.SphereGeometry(2,128,128);
 const material = new THREE.MeshStandardMaterial({
-color:0x7b2cbf,
+color:0x8e44ff,
 emissive:0x5a189a,
-emissiveIntensity:0.7,
-metalness:0.6,
+emissiveIntensity:0.6,
+metalness:0.5,
 roughness:0.4
 });
 const planet = new THREE.Mesh(geometry,material);
-planetGroup.add(planet);
+group.add(planet);
 
-// BRILLO CENTRAL
-const glowGeometry = new THREE.SphereGeometry(2.05,128,128);
-const glowMaterial = new THREE.MeshBasicMaterial({
-color:0xff00ff,
-transparent:true,
-opacity:0.15
-});
-const glow = new THREE.Mesh(glowGeometry,glowMaterial);
-planetGroup.add(glow);
-
-// ANILLO
-const ringGeometry = new THREE.RingGeometry(2.6,3.8,128);
-const ringMaterial = new THREE.MeshBasicMaterial({
+// ANILLO BONITO
+const ringGeo = new THREE.RingGeometry(2.6,3.6,128);
+const ringMat = new THREE.MeshBasicMaterial({
 color:0xffffff,
 side:THREE.DoubleSide,
 transparent:true,
 opacity:0.25
 });
-const ring = new THREE.Mesh(ringGeometry,ringMaterial);
-ring.rotation.x = Math.PI/2.4;
-planetGroup.add(ring);
+const ring = new THREE.Mesh(ringGeo,ringMat);
+ring.rotation.x = Math.PI/2.5;
+group.add(ring);
 
-// SEGUNDO PLANETA AZUL
-const geometry2 = new THREE.SphereGeometry(1.2,128,128);
-const material2 = new THREE.MeshStandardMaterial({
-color:0x00b4d8,
-emissive:0x0077b6,
-emissiveIntensity:0.5,
-metalness:0.5,
-roughness:0.5
-});
-const planet2 = new THREE.Mesh(geometry2,material2);
-planet2.position.x = -4;
-planetGroup.add(planet2);
-
-// ESTRELLAS FINAS REALISTAS
+// ESTRELLAS PEQUEÑAS
 const starGeometry = new THREE.BufferGeometry();
 const starVertices = [];
 
-for(let i=0;i<10000;i++){
+for(let i=0;i<8000;i++){
 starVertices.push(
-(Math.random()-0.5)*300,
-(Math.random()-0.5)*300,
-(Math.random()-0.5)*300
+(Math.random()-0.5)*250,
+(Math.random()-0.5)*250,
+(Math.random()-0.5)*250
 );
 }
 
@@ -132,16 +120,13 @@ new THREE.Float32BufferAttribute(starVertices,3)
 
 const starMaterial = new THREE.PointsMaterial({
 color:0xffffff,
-size:0.08,
-transparent:true,
-opacity:0.9,
-sizeAttenuation:true
+size:0.06
 });
 
 const stars = new THREE.Points(starGeometry,starMaterial);
 scene.add(stars);
 
-// FRASES FLOTANTES BIEN DISTRIBUIDAS
+// FRASES SIN MANCHAS
 const frases = [
 "Te amo 💜","Mi princesa 👑","Mi reina ❤️","Mi luna 🌙",
 "Mi perla 🤍","Mi sol ☀️","Mi estrella ✨",
@@ -153,22 +138,20 @@ const frases = [
 "Mi cielo 🌠","Mi corazón ❤️","Mi angelito 😇"
 ];
 
-for(let i=0;i<500;i++){
+for(let i=0;i<400;i++){
 const div = document.createElement("div");
-div.innerText = frases[Math.floor(Math.random()*frases.length)];
-div.style.position="absolute";
-div.style.color="white";
-div.style.fontSize=(Math.random()*16+10)+"px";
+div.className="frase";
+div.innerText=frases[Math.floor(Math.random()*frases.length)];
+div.style.fontSize=(Math.random()*14+10)+"px";
 div.style.left=Math.random()*window.innerWidth+"px";
 div.style.top=Math.random()*window.innerHeight+"px";
-div.style.opacity=0.7;
-div.style.pointerEvents="none";
 document.body.appendChild(div);
 }
 
-// GIRAR CON DEDO (TACTIL)
+// CONTROL TÁCTIL
 let isDragging=false;
-let prevX=0, prevY=0;
+let prevX=0;
+let prevY=0;
 
 document.addEventListener("touchstart",(e)=>{
 isDragging=true;
@@ -184,8 +167,8 @@ if(!isDragging) return;
 let deltaX=e.touches[0].clientX-prevX;
 let deltaY=e.touches[0].clientY-prevY;
 
-planetGroup.rotation.y += deltaX*0.005;
-planetGroup.rotation.x += deltaY*0.005;
+group.rotation.y += deltaX*0.005;
+group.rotation.x += deltaY*0.005;
 
 prevX=e.touches[0].clientX;
 prevY=e.touches[0].clientY;
@@ -195,7 +178,6 @@ prevY=e.touches[0].clientY;
 function animate(){
 requestAnimationFrame(animate);
 planet.rotation.y += 0.002;
-planet2.rotation.y -= 0.003;
 renderer.render(scene,camera);
 }
 animate();
