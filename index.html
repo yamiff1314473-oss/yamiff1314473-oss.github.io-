@@ -78,39 +78,77 @@ document.body.appendChild(renderer.domElement);
 
 const controls = new THREE.OrbitControls(camera, renderer.domElement);
 
-// PLANETA PRO
+// PLANETA ULTRA REALISTA
+const planetGroup = new THREE.Group();
+scene.add(planetGroup);
+
+// Textura tipo nube
+const canvasTexture = document.createElement("canvas");
+canvasTexture.width = 1024;
+canvasTexture.height = 512;
+const ctx = canvasTexture.getContext("2d");
+
+const gradient = ctx.createRadialGradient(
+  512,256,100,
+  512,256,500
+);
+
+gradient.addColorStop(0,"#ff00cc");
+gradient.addColorStop(0.4,"#9d4edd");
+gradient.addColorStop(0.7,"#5a189a");
+gradient.addColorStop(1,"#240046");
+
+ctx.fillStyle = gradient;
+ctx.fillRect(0,0,1024,512);
+
+for(let i=0;i<8000;i++){
+  ctx.fillStyle = "rgba(255,255,255,0.03)";
+  ctx.beginPath();
+  ctx.arc(
+    Math.random()*1024,
+    Math.random()*512,
+    Math.random()*2,
+    0,
+    Math.PI*2
+  );
+  ctx.fill();
+}
+
+const texture = new THREE.CanvasTexture(canvasTexture);
+
 const geometry = new THREE.SphereGeometry(2, 128, 128);
 const material = new THREE.MeshStandardMaterial({
-  color: 0x9d4edd,
+  map: texture,
   emissive: 0x5a189a,
-  metalness: 0.5,
-  roughness: 0.6
+  emissiveIntensity: 0.6,
+  metalness: 0.4,
+  roughness: 0.5
 });
+
 const planet = new THREE.Mesh(geometry, material);
-scene.add(planet);
+planetGroup.add(planet);
 
-// Aura
-const glowGeometry = new THREE.SphereGeometry(2.3, 128, 128);
-const glowMaterial = new THREE.MeshBasicMaterial({
-  color: 0xc77dff,
-  transparent: true,
-  opacity: 0.25
+// ATMÓSFERA
+const atmosphereGeometry = new THREE.SphereGeometry(2.2,128,128);
+const atmosphereMaterial = new THREE.MeshBasicMaterial({
+  color:0xc77dff,
+  transparent:true,
+  opacity:0.15
 });
-const glow = new THREE.Mesh(glowGeometry, glowMaterial);
-scene.add(glow);
+const atmosphere = new THREE.Mesh(atmosphereGeometry, atmosphereMaterial);
+planetGroup.add(atmosphere);
 
-// Anillo
-const ringGeometry = new THREE.RingGeometry(2.8, 3.8, 128);
+// ANILLO MEJORADO
+const ringGeometry = new THREE.RingGeometry(2.6,3.8,128);
 const ringMaterial = new THREE.MeshBasicMaterial({
-  color: 0xffffff,
-  side: THREE.DoubleSide,
-  transparent: true,
-  opacity: 0.4
+  color:0xffffff,
+  side:THREE.DoubleSide,
+  transparent:true,
+  opacity:0.3
 });
 const ring = new THREE.Mesh(ringGeometry, ringMaterial);
-ring.rotation.x = Math.PI / 2.4;
-scene.add(ring);
-
+ring.rotation.x = Math.PI/2.5;
+planetGroup.add(ring);
 // Luces
 const light1 = new THREE.PointLight(0xffffff, 2);
 light1.position.set(5, 5, 5);
