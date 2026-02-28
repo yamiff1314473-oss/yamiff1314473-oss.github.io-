@@ -2,14 +2,13 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Mi Galaxia</title>
+<title>Mi Galaxia 💜</title>
 
 <style>
 body{
   margin:0;
   overflow:hidden;
   background:black;
-  font-family:Arial;
 }
 
 .stars{
@@ -17,12 +16,20 @@ body{
   height:1px;
   background:white;
   position:absolute;
-  animation:animStar 50s linear infinite;
   box-shadow:
-  200px 100px #fff, 400px 300px #fff, 600px 500px #fff,
-  800px 200px #fff, 1000px 400px #fff,
-  1200px 100px #fff, 1400px 600px #fff,
-  1600px 300px #fff, 1800px 500px #fff;
+  100px 200px white,
+  300px 400px white,
+  500px 100px white,
+  700px 300px white,
+  900px 500px white,
+  1200px 200px white,
+  1500px 400px white,
+  1700px 600px white,
+  200px 700px white,
+  400px 900px white,
+  800px 1200px white,
+  1000px 1500px white;
+  animation: animStar 50s linear infinite;
 }
 
 @keyframes animStar{
@@ -32,11 +39,11 @@ body{
 
 h1{
   position:absolute;
-  top:45%;
+  top:40%;
   width:100%;
   text-align:center;
   color:#ff69b4;
-  font-size:40px;
+  font-size:35px;
   text-shadow:0 0 20px #ff69b4;
 }
 </style>
@@ -46,17 +53,9 @@ h1{
 
 <div class="stars"></div>
 
-<h1 id="mensaje">Escribe aquí tu mensaje</h1>
-
-<script>
-function cambiarMensaje(){
-  var texto = prompt("Escribe el apodo o mensaje:");
-  if(texto){
-    document.getElementById("mensaje").innerHTML = texto;
-  }
-}
-document.body.onclick = cambiarMensaje;
-</script>
+<h1 contenteditable="true">
+Escribe aquí tu mensaje 💖
+</h1>
 
 </body>
 </html>
